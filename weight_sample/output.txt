@@ -1,0 +1,9 @@
+For add_weight("a", 10). Thrax has weights on states, Pynini on arcs.
+Thrax:
+0	1	97	97
+1	10
+
+Pynini:
+0	1	97	97	10
+1
+
