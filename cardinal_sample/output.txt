@@ -1,0 +1,21 @@
+Proof pynini is slower:
+With string length=454
+Pynini: 0.002941608428955078s
+Thrax: 0.001997566223144531s
+
+With string length=4549
+Pynini: 0.023353433609008788s
+Thrax: 0.017211008071899413s
+
+With string length=45499
+Pynini: 0.23059697151184083s
+Thrax: 0.16774301528930663s
+
+With string length=454999
+Pynini: 3.3599258422851563s
+Thrax: 2.6150733470916747s
+
+With string length=2274999
+Pynini: 21.74833984375s
+Thrax: 15.20512833595276s
+
