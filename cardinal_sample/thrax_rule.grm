@@ -1,0 +1,108 @@
+import 'byte.grm' as bytes;
+
+
+
+
+# separators
+and_rmv = (bytes.kSpace? "and" bytes.kSpace?) : "";
+space_rmv = bytes.kSpace* : "";
+dash_rmv = "-" : "";
+
+# shortcuts
+dash_space_rmv = space_rmv | dash_rmv;
+dash_space_and_rmv = space_rmv | dash_space_rmv | and_rmv;
+space_and_rmv = space_rmv | and_rmv;
+zero_ins = "" : "0";
+
+# ground values
+digit_no_zero = (
+    ("one":"1") |
+    ("two":"2") |
+    ("three":"3") |
+    ("four":"4") |
+    ("five":"5") |
+    ("six":"6") |
+    ("seven":"7") |
+    ("eight":"8") |
+    ("nine":"9")
+);
+
+digit_zero = ("zero" | "oh" | "naught") : "0";
+single_digit = digit_no_zero | digit_zero;
+teens = (
+    ("ten":"10") |
+    ("eleven":"11") |
+    ("twelve":"12") |
+    ("thirteen":"13") |
+    ("fourteen":"14") |
+    ("fifteen":"15") |
+    ("sixteen":"16") |
+    ("seventeen":"17") |
+    ("eighteen":"18") |
+    ("nineteen":"19")
+);
+
+ties = (
+    ("twenty":"2") |
+    ("thirty":"3") |
+    ("fourty":"4") |
+    ("fifty":"5") |
+    ("sixty":"6") |
+    ("seventy":"7") |
+    ("eighty":"8") |
+    ("ninety":"9")
+);
+
+# suffix rmv
+hundred_rmv = ("hundred" + "s"?) : "";
+thousand_rmv = ("thousand" + "s"?) : "";
+
+# compounds
+two_digits = (
+    teens | 
+    (ties dash_space_and_rmv? digit_no_zero) | 
+    (ties zero_ins)
+);
+
+hundred_prefix = (
+    (digit_no_zero space_rmv hundred_rmv) | 
+    (("a" space_rmv "hundred" "s"?) : "1")
+    );
+
+hundred_suffix = (
+    (zero_ins single_digit) | 
+    two_digits | 
+    (zero_ins{2}<0.1>)
+);
+
+three_digits = hundred_prefix space_and_rmv? hundred_suffix;
+
+thousand_prefix_1_digit = (
+    (digit_no_zero space_rmv thousand_rmv) |
+    (("a"? space_rmv "thousand" "s"?): "1")
+);
+
+thousand_suffix = (
+    three_digits |
+    ((
+        (zero_ins{2} single_digit) | 
+        (zero_ins two_digits)
+    ) <1>) |
+    (zero_ins{3}<2>)
+);
+
+four_digits = (
+    (thousand_prefix_1_digit space_and_rmv? thousand_suffix) |
+    (two_digits space_rmv hundred_rmv space_and_rmv hundred_suffix)
+);
+
+five_digits = two_digits space_rmv thousand_rmv space_and_rmv? thousand_suffix;
+six_digits = three_digits space_rmv thousand_rmv space_and_rmv? thousand_suffix;
+
+cardinal = (
+    (single_digit<40>) |
+    ((two_digits | three_digits)<30>)|
+    ((four_digits | five_digits | six_digits)<20>)
+);
+
+export rule_001 = CDRewrite[cardinal, "[BOS]" | bytes.kSpace, "[EOS]", bytes.kBytes*];
